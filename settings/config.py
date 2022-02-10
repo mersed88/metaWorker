@@ -24,7 +24,7 @@ host_postgres = os.getenv("HOST_POSTGRES", "188.120.237.127")
 port_postgres = os.getenv("PORT_POSTGRES", "5432")
 db_postgres = os.getenv("DB_POSTGRES", "postgres")
 
-engine_string = f'postgresql+asyncpg://{user_postgres}:{password_postgres}@{host_postgres}:{port_postgres}/{db_postgres}'
-schema_db = os.getenv("SCHEMA", "taskManager")
+engine_string = f'postgresql://{user_postgres}:{password_postgres}@{host_postgres}:{port_postgres}/{db_postgres}'
+schema_db = os.getenv("SCHEMA", "taskmanager")
 
-url = os.getenv("URL", "localhost:8080")
+url = os.getenv("URL", "http://localhost:8080")

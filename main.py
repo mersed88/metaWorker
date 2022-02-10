@@ -1,5 +1,7 @@
 # coding: utf-8
+import io
 import json
+import pickle
 
 import uvicorn
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -8,9 +10,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import requests
 
+from dto.profile import ProfileOut
 from dto.worker import WorkerOut, WorkerIn
-from settings.config import host, port, logger, url, headers
+from settings.config import HOST, PORT, logger, url, headers
 from src.init_db import init_db
+from src.run_scenario import Scenario
 
 sched = BackgroundScheduler(daemon=True)
 
@@ -35,15 +39,33 @@ async def HealthCheck():
     return JSONResponse(status_code=200, content={})
 
 
-@sched.scheduled_job('interval', seconds=10)
+@sched.scheduled_job('interval', seconds=10000000)
 def job():
     try:
-        param = WorkerIn(id=1)
-        task = WorkerOut(**requests.get(url=url, headers=headers, data=json.dumps(param)).json())
+        profile: ProfileOut = ProfileOut(**requests.get(url=f"{url}/GetProfile", headers=headers, data=json.dumps({})).json())
+        # task = requests.get(url=f"{url}/GetTask", headers=headers, data=json.dumps({})).json()
+        # task = io.BytesIO(task.content)
+        # pick = pickle.loads(task.getbuffer())
+        # pick()
+        for cookie in json.loads(profile.deviceCookies.device_cookies):
+            play.add_cookie(cookie=cookie)
+
+        play.run("yandex.ru")
+
         # TODO выполнение задачи
     except Exception as e:
         logger.error(e)
 
 
+play = Scenario()
 if __name__ == '__main__':
-    uvicorn.run(app, host=str(host), port=int(port), debug=False)
+    profile: ProfileOut = ProfileOut(
+        **requests.get(url=f"{url}/GetProfile", headers=headers, data=json.dumps({})).json())
+    # task = requests.get(url=f"{url}/GetTask", headers=headers, data=json.dumps({})).json()
+    # task = io.BytesIO(task.content)
+    # pick = pickle.loads(task.getbuffer())
+    # pick()
+    for cookie in json.loads(profile.deviceCookies.device_cookies):
+        play.add_cookie(cookie=cookie)
+
+    play.run("yandex.ru")
