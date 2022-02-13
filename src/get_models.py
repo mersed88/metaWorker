@@ -63,11 +63,11 @@ if __name__ == '__main__':
 
     from io import BytesIO
 
-    with open("../tt.pkl", 'rb') as fh:
+    with open("../scenario.pkl", 'rb') as fh:
         buf = BytesIO(fh.read())
 
     insert_task(
         session=session,
-        name_scenario="test_end",
+        name_scenario="main_scenario",
         pickle=buf.getvalue()
     )
