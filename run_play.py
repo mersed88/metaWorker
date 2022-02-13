@@ -65,7 +65,7 @@ if __name__ =='__main__':
 
     else:
         print('-kill_browser-')
-    #     kill_browser()
+        kill_browser()
 
 
 
