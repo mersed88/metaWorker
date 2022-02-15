@@ -1,14 +1,12 @@
-from base64 import b64encode
-import time
-import requests
-import undetected_chromedriver as uc
-from helium import *
-
-from pr import create_proxyauth_extension
 import random
+import time
 
-from helium import *
 import undetected_chromedriver as uc
+from helium import *
+
+from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
+from pr import create_proxyauth_extension
 
 
 class Scenario:
@@ -19,20 +17,25 @@ class Scenario:
         login = "ppbfic4uf"
         password = "gth8ji3ma7"
 
-        self.driver = uc.Chrome()
-        self.options = uc.ChromeOptions()
-
+        self.options = Options()
         proxyauth_plugin_path = create_proxyauth_extension(
             proxy_host=ip,
             proxy_port=port,
             proxy_username=login,
             proxy_password=password
         )
-
         self.options.add_argument("--start-maximized")
-        self.options.add_extension(proxyauth_plugin_path)
+        # self.options.add_argument(f"--proxy-server={ip}:{port}")
+        # self.options.add_extension(proxyauth_plugin_path)
+        self.options.add_argument("--no-sandbox")
+        self.options.add_argument("--disable-dev-shm-usage")
+        self.options.add_argument('--headless')
+        self.options.add_argument('--disable-gpu')
+        self.options.add_argument('--remote-debugging-address=0.0.0.0')
+        self.options.add_argument('--remote-debugging-port=9222')
+        # self.options.add_argument("--disable-extensions")
 
-        self.options.add_argument(f"--proxy-server={ip}:{port}")
+        self.driver = uc.Chrome(options=self.options)
 
     def add_cookie(self, cookie):
         self.driver.add_cookie(cookie_dict=cookie)
@@ -61,7 +64,7 @@ class Scenario:
 
     def start(self):
         set_driver(self.driver)
-        start_chrome(options=self.options)
+        # start_chrome(options=self.options)
         url = 'http://v02.tvigle.ru/video/versus/season1/krutoi-protiv-tolpy-vd/?ref=1600'
         go_to(url)
         # helium.refresh()
@@ -95,9 +98,7 @@ class Scenario:
             kill_browser()
 
 if __name__ == '__main__':
+    a = Scenario()
+    a.start()
 
-    import pandas as pd
-    pd.to_pickle(Scenario(), "scenario.pkl")
-    # a = Scenario()
-    # a.start()
 

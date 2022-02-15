@@ -47,7 +47,8 @@ def job():
         profile: ProfileOut = ProfileOut(**requests.get(url=f"{url}/GetProfile", headers=headers, data=json.dumps({})).json())
         task = requests.get(url=f"{url}/GetTask", headers=headers, data=json.dumps({}))
         tt = 0
-        if task.content:
+        if task.status_code == 200:
+            logger.info("start scenario")
             game = play()
             for item in ast.literal_eval(profile.deviceCookies.device_cookies.decode()):
                 try:
@@ -77,13 +78,13 @@ def job():
 
 
 if __name__ == '__main__':
-
+    ...
 
     # with open("scenario.pkl", "rb") as file:
     #     pick = pickle.load(file)
     # a = pick
     # a.start()
-    uvicorn.run(app=app, host="localhost",port=8081)
+    uvicorn.run(app=app, host=HOST,port=PORT)
     # profile: ProfileOut = ProfileOut(
     #     **requests.get(url=f"{url}/GetProfile", headers=headers, data=json.dumps({})).json())
     # # task = requests.get(url=f"{url}/GetTask", headers=headers, data=json.dumps({})).json()

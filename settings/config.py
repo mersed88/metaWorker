@@ -3,8 +3,6 @@
 import logging
 import requests
 import os
-from cmreslogging.handlers import CMRESHandler
-import yaml
 import datetime
 
 logger = logging.getLogger(__name__)
