@@ -25,8 +25,8 @@ class Scenario:
             proxy_password=password
         )
         self.options.add_argument("--start-maximized")
-        # self.options.add_argument(f"--proxy-server={ip}:{port}")
-        # self.options.add_extension(proxyauth_plugin_path)
+        self.options.add_argument(f"--proxy-server={ip}:{port}")
+        self.options.add_extension(proxyauth_plugin_path)
         self.options.add_argument("--no-sandbox")
         self.options.add_argument("--disable-dev-shm-usage")
         self.options.add_argument('--headless')
@@ -35,7 +35,7 @@ class Scenario:
         self.options.add_argument('--remote-debugging-port=9222')
         # self.options.add_argument("--disable-extensions")
 
-        self.driver = uc.Chrome(options=self.options)
+        self.driver = uc.Chrome(options=self.options, version_main=95)
 
     def add_cookie(self, cookie):
         self.driver.add_cookie(cookie_dict=cookie)
