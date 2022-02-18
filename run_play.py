@@ -45,16 +45,21 @@ class Scenario:
         urls.append('https://yandex.ru/')
 
         go_to(random.choice(urls))
+        print('___go to url___')
 
     def func_wait(self):
         click(S('.TviglePlayer'))
+        print('___start wait___')
         time.sleep(random.randint(6, 6 * 10))
         click(S('.TviglePlayer'))
+        print('___stop wait___')
 
     def func_exit(self):
+        print('___go to kill browser___')
         kill_browser()
 
     def func_ads(self):
+        print('___turn-off-ads___')
         click(S('.turn-off-ads'))
         time.sleep(random.randint(6, 3 * 10))
         click(S('.close'))
@@ -62,8 +67,10 @@ class Scenario:
     def start(self):
         set_driver(self.driver)
         start_chrome(options=self.options)
+        print('___start browser___')
         url = 'http://v02.tvigle.ru/video/versus/season1/krutoi-protiv-tolpy-vd/?ref=1600'
         go_to(url)
+        print('___open tvigle__')
         # helium.refresh()
 
         time.sleep(random.randint(37, 73))
@@ -82,6 +89,7 @@ class Scenario:
             time.sleep(random.randint(5, 7))
             #     click(S('.turn-off-ads'))
             click(S('.TviglePlayer'))
+            print('---click start pleer---')
             time.sleep(random.randint(59 * 10, 59 * 23))
             #     click(S('.TviglePlayer'))
             #     time.sleep(random.randint(6*1,6*2))
@@ -89,9 +97,10 @@ class Scenario:
             getrandom = random.choice([self.func_urls, self.func_wait, self.func_exit, self.func_ads])
             getrandom()
             kill_browser()
+            print('---finish kill_browser---')
 
         else:
-            print('-kill_browser-')
+            print('---нет кнопки -- kill_browser-')
             kill_browser()
 
 if __name__ == '__main__':
