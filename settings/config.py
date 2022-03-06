@@ -26,3 +26,5 @@ engine_string = f'postgresql://{user_postgres}:{password_postgres}@{host_postgre
 schema_db = os.getenv("SCHEMA", "taskmanager")
 
 url = os.getenv("URL", "http://localhost:8080")
+file_path = os.getenv("FILE_PATH", "nohup.out")
+

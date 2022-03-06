@@ -1,46 +1,12 @@
-FROM debian:buster-slim
-LABEL name="chrome-headless" \
-	maintainer="Justin Ribeiro <justin@justinribeiro.com>" \
-	version="3.0" \
-	description="Google Chrome Headless in a container"
+FROM selenium/standalone-chrome:latest
 
-# Install deps + add Chrome Stable + purge all the things
-RUN apt-get update && apt-get install -y \
-	apt-transport-https \
-	ca-certificates \
-	curl \
-	gnupg \
-	--no-install-recommends \
-	&& curl -sSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
-	&& echo "deb https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
-	&& apt-get update && apt-get install -y \
-	google-chrome-stable \
-	fontconfig \
-	fonts-ipafont-gothic \
-	fonts-wqy-zenhei \
-	fonts-thai-tlwg \
-	fonts-kacst \
-	fonts-symbola \
-	fonts-noto \
-	fonts-freefont-ttf \
-	--no-install-recommends \
-	&& apt-get purge --auto-remove -y curl gnupg \
-	&& rm -rf /var/lib/apt/lists/*
-
-# Add Chrome as a user
-RUN groupadd -r chrome && useradd -r -g chrome -G audio,video chrome \
-	&& mkdir -p /home/chrome && chown -R chrome:chrome /home/chrome
-
-
+USER root
 WORKDIR /home/app
-
-
 COPY requirements.txt  requirements.txt
 
 RUN apt-get update && apt install -y python3 && apt install -y python3-dev && apt install -y python3-pip
 
-USER chrome
-
+USER seluser
 RUN python3 -m pip install --upgrade pip
 RUN pip3 install -r requirements.txt
 
@@ -54,5 +20,6 @@ COPY main.py main.py
 COPY pr.py pr.py
 COPY run_play.py run_play.py
 
+RUN nohup /opt/bin/entry_point.sh &
 
 CMD python3 main.py

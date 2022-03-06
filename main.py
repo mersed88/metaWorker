@@ -7,12 +7,12 @@ import uvicorn
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 import requests
 
 from dto.profile import ProfileOut
 from dto.worker import WorkerOut, WorkerIn
-from settings.config import HOST, PORT, logger, url, headers
+from settings.config import HOST, PORT, logger, url, headers, file_path
 from src.init_db import init_db
 from src.run_scenario import Scenario
 from run_play import Scenario as play
@@ -41,6 +41,15 @@ async def HealthCheck():
     return JSONResponse(status_code=200, content={})
 
 
+@app.get('/log')
+async def log():
+    """Функция отображения логово"""
+    with open(file_path,"r") as file:
+        text = file.read()
+
+    return PlainTextResponse(status_code=200, content=text)
+
+
 @sched.scheduled_job('interval', seconds=10)
 def job():
     try:
@@ -57,7 +66,8 @@ def job():
                     )
                     tt+=1
                 except Exception as e:
-                    print(tt)
+                    # print(tt)
+                    ...
             game.start()
         #task = io.BytesIO(task.content)
         # with open ("test_data.pkl","wb") as file:
