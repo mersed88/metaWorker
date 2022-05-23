@@ -1,6 +1,8 @@
 # coding: utf-8
+import io
 import json
-
+import pickle
+import ast
 import uvicorn
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI
@@ -8,9 +10,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import requests
 
+from dto.profile import ProfileOut
 from dto.worker import WorkerOut, WorkerIn
-from settings.config import host, port, logger, url, headers
+from settings.config import HOST, PORT, logger, url, headers
 from src.init_db import init_db
+from src.run_scenario import Scenario
+from run_play import Scenario as play
 
 sched = BackgroundScheduler(daemon=True)
 
@@ -26,7 +31,8 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def on_startup():
-    await init_db()
+    init_db()
+    sched.start()
 
 
 @app.get('/healthcheck')
@@ -38,12 +44,53 @@ async def HealthCheck():
 @sched.scheduled_job('interval', seconds=10)
 def job():
     try:
-        param = WorkerIn(id=1)
-        task = WorkerOut(**requests.get(url=url, headers=headers, data=json.dumps(param)).json())
+        profile: ProfileOut = ProfileOut(**requests.get(url=f"{url}/GetProfile", headers=headers, data=json.dumps({})).json())
+        task = requests.get(url=f"{url}/GetTask", headers=headers, data=json.dumps({}))
+        tt = 0
+        if task.content:
+            game = play()
+            for item in ast.literal_eval(profile.deviceCookies.device_cookies.decode()):
+                try:
+                    game.add_cookie(
+                        item
+                    )
+                    tt+=1
+                except Exception as e:
+                    print(tt)
+            game.start()
+        #task = io.BytesIO(task.content)
+        # with open ("test_data.pkl","wb") as file:
+        #     file.write(task.getbuffer())
+
+        # with open ("scenario.pkl","rb") as file:
+        #     pick = pickle.load(file)
+        # pick.start()
+
+        # for cookie in json.loads(profile.deviceCookies.device_cookies):
+        #     play.add_cookie(cookie=cookie)
+        #
+        # play.run("yandex.ru")
+
         # TODO выполнение задачи
     except Exception as e:
         logger.error(e)
 
 
 if __name__ == '__main__':
-    uvicorn.run(app, host=str(host), port=int(port), debug=False)
+
+
+    # with open("scenario.pkl", "rb") as file:
+    #     pick = pickle.load(file)
+    # a = pick
+    # a.start()
+    uvicorn.run(app=app, host="localhost",port=8081)
+    # profile: ProfileOut = ProfileOut(
+    #     **requests.get(url=f"{url}/GetProfile", headers=headers, data=json.dumps({})).json())
+    # # task = requests.get(url=f"{url}/GetTask", headers=headers, data=json.dumps({})).json()
+    # # task = io.BytesIO(task.content)
+    # # pick = pickle.loads(task.getbuffer())
+    # # pick()
+    # for cookie in json.loads(profile.deviceCookies.device_cookies):
+    #     play.add_cookie(cookie=cookie)
+    #
+    # play.run("yandex.ru")
